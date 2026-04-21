@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>EduJump Studio 39.0 - Victory Celebration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Nunito:wght@800&family=Open+Sans:wght@800&family=Roboto+Mono:wght@700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #020617; --pn: #0f172a; --bd: #1e293b; --acc: #f59e0b; --txt: #f8fafc; --ok: #10b981; }
+        body { margin: 0; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--txt); height: 100vh; display: flex; overflow: hidden; }
+        #editor { width: 440px; background: var(--pn); border-right: 2px solid var(--bd); display: flex; flex-direction: column; padding: 15px; z-index: 100; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .scroll { flex: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 10px; }
+        h2 { font-family: 'Chakra Petch'; color: var(--acc); font-size: 0.8rem; margin: 15px 0 8px; text-transform: uppercase; border-bottom: 1px solid var(--bd); padding-bottom: 4px; letter-spacing: 1px; }
+        .box { background: rgba(255,255,255,0.03); border: 1px solid var(--bd); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
+        .ui-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ui-item { display: flex; flex-direction: column; gap: 4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .ui-item label { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: bold; margin: 0; }
+        input[type="color"] { -webkit-appearance: none; border: 2px solid #334155; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; background: none; padding: 0; overflow: hidden; margin: auto; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+        textarea { width: 100%; height: 150px; background: #020617; color: #fff; border: 1px solid var(--bd); border-radius: 4px; font-size: 13px; padding: 10px; resize: none; font-family: monospace; line-height: 1.4; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 8px; margin: 4px 0; border-radius: 4px; border: 1px solid var(--bd); background: #020617; color: #fff; font-size: 11px; box-sizing: border-box; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Chakra Petch'; text-transform: uppercase; transition: 0.2s; width: 100%; }
+        .btn-play { background: var(--acc); color: #000; font-size: 1.1rem; margin-top: 5px; }
+        .btn-gen { background: var(--ok); color: #fff; margin-top: 10px; }
+        .btn-copy { background: #3b82f6; color: #fff; margin-top: 10px; display: none; }
+        #game-area { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; position: relative; overflow: hidden; }
+        #stage { position: relative; width: 800px; height: 450px; border-radius: 20px; overflow: hidden; background: #020617; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; touch-action: none; cursor: pointer; width: 800px; height: 450px; }
+        #rabbit-gif { position: absolute; z-index: 10; pointer-events: none; transform-origin: center bottom; display: none; height: auto; }
+        #vol-ui { position: absolute; top: 15px; right: 15px; z-index: 110; background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: 20px; backdrop-filter: blur(5px); display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.1); color:#fff; }
+        #win-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 85%; max-height: 90%; padding: 30px; border-radius: 30px; z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center; box-sizing: border-box; }
+        #win-rabbit-gif { height: auto; margin-bottom: 20px; display: none; max-height: 180px; width: auto; }
+        #win-title { width: 100%; word-wrap: break-word; font-size: 2.2rem; margin: 10px 0; }
+        #creator-credit { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 20px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: rgba(255,255,255,0.3); font-size: 10px; }
+        #creator-credit img { max-width: 140px; height: auto; margin-bottom: 10px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div id="editor">
+    <h1 style="font-family:'Chakra Petch'; color:var(--acc); margin:0; font-size:1.4rem">STUDIO 39.0</h1>
+    <div class="scroll">
+        <h2>🎨 ЦВЕТА И FX</h2>
+        <div class="box">
+            <div class="ui-grid">
+                <div class="ui-item"><label>Шрифт</label>
+                    <select id="st-font" onchange="liveStyle()">
+                        <option value="Nunito">Nunito</option>
+                        <option value="Chakra Petch">Chakra Petch</option>
+                        <option value="Comfortaa">Comfortaa</option>
+                        <option value="Roboto Mono">Roboto Mono</option>
+                        <option value="Open Sans">Open Sans</option>
+                    </select>
+                </div>
+                <div class="ui-item"><label>Победный FX</label>
+                    <select id="st-fx" onchange="liveStyle()">
+                        <option value="fireworks">💥 Салют</option>
+                        <option value="confetti">🎉 Конфетти</option>
+                        <option value="hearts">❤️ Сердечки</option>
+                        <option value="stars">✨ Звезды</option>
+                    </select>
+                </div>
+            </div>
+            <div class="ui-grid" style="margin-top:10px">
+                <div class="ui-item" style="flex-direction:row"><label>Фон вопроса</label><input type="color" id="clr-q-bg" value="#0f172a" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Рамка вопроса</label><input type="color" id="clr-q-bd" value="#ffffff" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Текст вопроса</label><input type="color" id="clr-q-txt" value="#f59e0b" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Цвет Glow</label><input type="color" id="clr-glow" value="#f59e0b" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Окно победы</label><input type="color" id="clr-win-bg" value="#0f172a" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Текст победы</label><input type="color" id="clr-win-txt" value="#f59e0b" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Фон Retry</label><input type="color" id="clr-btn-bg" value="#f59e0b" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Текст Retry</label><input type="color" id="clr-btn-txt" value="#000000" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Текст ответов</label><input type="color" id="clr-ans-txt" value="#ffffff" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Рамка финала</label><input type="color" id="clr-win-bd" value="#f59e0b" oninput="liveStyle()"></div>
+            </div>
+            <div style="margin-top:10px; display: flex; flex-direction: column; gap: 5px;">
+                <label style="cursor:pointer; font-size:10px;"><input type="checkbox" id="st-chk-glow" checked onchange="liveStyle()"> ВКЛЮЧИТЬ СИЯНИЕ (GLOW)</label>
+                <label style="cursor:pointer; font-size:10px; color: var(--ok);"><input type="checkbox" id="st-chk-trans" onchange="liveStyle()"> ПРОЗРАЧНЫЙ ФОН (ДЛЯ GENIALLY)</label>
+            </div>
+        </div>
+
+        <h2>🖼 ВИЗУАЛ (URL И РАЗМЕРЫ)</h2>
+        <div class="box">
+            <div class="ui-item"><label>Герой ИГРА (GIF)</label><input type="text" id="inp-h" oninput="updateRabbit(this.value)"></div>
+            <div class="ui-item" style="margin-top:5px"><label>Размер героя (px)</label><input type="range" id="st-h-size" min="30" max="250" value="60" oninput="liveStyle()"></div>
+            <div class="ui-item" style="margin-top:5px"><label>Герой ПОБЕДА (GIF)</label><input type="text" id="inp-h-win" oninput="updateWinRabbit(this.value)"></div>
+            <div class="ui-item" style="margin-top:5px"><label>Фон ПУТИ (JPG)</label><input type="text" id="inp-b" oninput="loadImg('b',this.value)"></div>
+            <div class="ui-item" style="margin-top:5px"><label>Платформа (PNG)</label><input type="text" id="inp-p" oninput="loadImg('p',this.value)"></div>
+        </div>
+
+        <h2>⚙️ НАСТРОЙКИ ПЛАТФОРМ</h2>
+        <div class="box">
+            <div class="ui-grid">
+                <div class="ui-item"><label>Ширина (W)</label><input type="number" id="st-p-w" value="210" oninput="liveStyle()"></div>
+                <div class="ui-item"><label>Высота (H)</label><input type="number" id="st-p-h" value="60" oninput="liveStyle()"></div>
+                <div class="ui-item"><label>Параллакс %</label><input type="range" id="inp-para" min="0" max="100" value="100" oninput="liveStyle()"></div>
+                <div class="ui-item"><label>Приземление</label><input type="range" id="inp-off" min="-150" max="150" value="0" oninput="liveStyle()"></div>
+            </div>
+            <label style="margin-top:10px; cursor:pointer; font-size:10px;"><input type="checkbox" id="shuffle-check" checked> ПЕРЕМЕШИВАТЬ ВОПРОСЫ</label>
+        </div>
+
+        <h2>📝 ЗАДАНИЯ</h2>
+        <div class="box"><textarea id="bulk">Одиннадцать | 11 | 12
+Двенадцать | 12 | 20
+Тринадцать | 13 | 30</textarea></div>
+        
+        <h2>🎵 ЗВУКИ (URL)</h2>
+        <div class="box"><div class="ui-grid">
+            <div class="ui-item"><label>Старт</label><input type="text" id="s-start" oninput="loadAudio('start',this.value)"></div>
+            <div class="ui-item"><label>Успех</label><input type="text" id="s-ok" oninput="loadAudio('ok',this.value)"></div>
+            <div class="ui-item"><label>Ошибка</label><input type="text" id="s-err" oninput="loadAudio('err',this.value)"></div>
+            <div class="ui-item"><label>Победа</label><input type="text" id="s-win" oninput="loadAudio('win',this.value)"></div>
+        </div></div>
+
+        <h2>🔤 ТЕКСТЫ</h2>
+        <div class="box"><div class="ui-grid">
+            <div class="ui-item"><label>Старт</label><input type="text" id="lbl-start" value="START"></div>
+            <div class="ui-item"><label>Победа</label><input type="text" id="lbl-win" value="VICTORY!"></div>
+            <div class="ui-item"><label>Повторить</label><input type="text" id="lbl-retry" value="RETRY"></div>
+        </div></div>
+
+        <div id="creator-credit">
+            <img src="https://raw.githubusercontent.com/VeRa422/sounds_-_effects/main/logo.png" alt="logo">
+            <div style="font-family:'Chakra Petch';">ИГРОВОЙ КВАРТАЛ. Все права защищены.</div>
+        </div>
+    </div>
+    
+    <button class="btn btn-play" onclick="initGame()">ЗАПУСТИТЬ ПРЕДПРОСМОТР 🚀</button>
+    <div style="margin-top:5px; border-top:1px solid var(--bd); padding-top:5px">
+        <button class="btn btn-gen" onclick="generateGeniallyCode()">ГЕНЕРИРОВАТЬ КОД ДЛЯ GENIALLY</button>
+        <div id="gen-msg" style="color:var(--ok); font-size:10px; text-align:center; margin-top:5px; display:none">КОД СГЕНЕРИРОВАН! ✨</div>
+        <button id="copy-btn" class="btn btn-copy" onclick="copyToClipboard()">СКОПИРОВАТЬ 📋</button>
+        <div id="copy-msg" style="color:var(--ok); font-size:10px; text-align:center; margin-top:5px; display:none">СКОПИРОВАНО!</div>
+    </div>
+</div>
+
+<div id="game-area">
+    <div id="stage">
+        <div id="vol-ui"><span>🔊</span><input type="range" style="width:60px" min="0" max="1" step="0.1" value="0.5" oninput="setGlobalVolume(this.value)"></div>
+        <canvas id="canvas" width="800" height="450"></canvas>
+        <img id="rabbit-gif" src="" alt="rabbit">
+        <div id="win-ui">
+            <img id="win-rabbit-gif" src="" alt="win-rabbit">
+            <h2 id="win-title">VICTORY!</h2>
+            <button class="btn" id="retry-btn-ui" onclick="initGame()">RETRY</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d'), rabbitImg = document.getElementById('rabbit-gif'), winRabbitImg = document.getElementById('win-rabbit-gif'), winUI = document.getElementById('win-ui'), stage = document.getElementById('stage');
+let cfg = { lv: [], pImg: null, bImg: null, audios: {}, labels: {}, st: {}, globalVol: 0.5 };
+let game = { active: false, loopId: null, camY: 0, player: { x: 400, y: 300, vy: 0, targetX: 400, lastPlatY: 400 }, platforms: [], particles: [], feetOffset: 0, won: false, currentQ: "", parallaxSpeed: 1, totalClimb: 0 };
+const FINISH_MARKER = "__GAME_FINISHED__";
+
+function showTemporaryMessage(id) { const el = document.getElementById(id); el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3000); }
+function setGlobalVolume(v) { cfg.globalVol = v; Object.values(cfg.audios).forEach(a => a.volume = v); }
+function hexToRgba(hex, alpha) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${alpha})`; }
+function loadImg(key, url) { if(!url) return; const img = new Image(); img.crossOrigin="anonymous"; img.onload=()=>cfg[key+'Img']=img; img.src=url; }
+function loadAudio(key, url) { if(!url) return; const a = new Audio(url); a.volume = cfg.globalVol; cfg.audios[key] = a; }
+function updateRabbit(url) { if(!url) return; rabbitImg.src = url; rabbitImg.style.display = 'block'; }
+function updateWinRabbit(url) { if(!url) return; winRabbitImg.src = url; winRabbitImg.style.display = 'block'; }
+
+function liveStyle() {
+    game.feetOffset = parseInt(document.getElementById('inp-off').value);
+    game.parallaxSpeed = parseInt(document.getElementById('inp-para').value) / 100;
+    
+    cfg.st = { 
+        font: document.getElementById('st-font').value, 
+        fx: document.getElementById('st-fx').value, 
+        qBg: document.getElementById('clr-q-bg').value, 
+        qBd: document.getElementById('clr-q-bd').value, 
+        qTxt: document.getElementById('clr-q-txt').value, 
+        glow: document.getElementById('clr-glow').value, 
+        winBg: document.getElementById('clr-win-bg').value, 
+        winBd: document.getElementById('clr-win-bd').value, 
+        winTxt: document.getElementById('clr-win-txt').value, 
+        btnBg: document.getElementById('clr-btn-bg').value, 
+        btnTxt: document.getElementById('clr-btn-txt').value, 
+        ansTxt: document.getElementById('clr-ans-txt').value, 
+        useGlow: document.getElementById('st-chk-glow').checked,
+        isTrans: document.getElementById('st-chk-trans').checked,
+        pW: parseInt(document.getElementById('st-p-w').value) || 210,
+        pH: parseInt(document.getElementById('st-p-h').value) || 60,
+        hSize: parseInt(document.getElementById('st-h-size').value) || 60
+    };
+
+    rabbitImg.style.width = cfg.st.hSize + 'px';
+    rabbitImg.style.height = 'auto'; 
+    winRabbitImg.style.width = (cfg.st.hSize * 2) + 'px';
+    winRabbitImg.style.height = 'auto';
+
+    // В превью прозрачность показываем как черный
+    stage.style.background = cfg.st.isTrans ? '#000' : '#020617';
+    winUI.style.background = hexToRgba(cfg.st.winBg, 0.7); winUI.style.border = `2px solid ${cfg.st.winBd}`;
+    const rBtn = document.getElementById('retry-btn-ui'); rBtn.style.background = cfg.st.btnBg; rBtn.style.color = cfg.st.btnTxt; rBtn.innerText = document.getElementById('lbl-retry').value;
+    const wTitle = document.getElementById('win-title'); wTitle.style.fontFamily = cfg.st.font; wTitle.style.color = cfg.st.winTxt; wTitle.innerText = document.getElementById('lbl-win').value;
+    if(cfg.st.useGlow) wTitle.style.textShadow = `0 0 20px ${cfg.st.glow}`; else wTitle.style.textShadow = "none";
+    
+    if(game.active && game.player.vy === 0) {
+        const hReal = rabbitImg.offsetHeight || cfg.st.hSize;
+        game.player.y = game.player.lastPlatY - (cfg.st.pH/2) - (hReal/2) - game.feetOffset;
+    }
+}
+
+function initGame() {
+    if(game.loopId) cancelAnimationFrame(game.loopId);
+    liveStyle();
+    cfg.lv = document.getElementById('bulk').value.split('\n').filter(l => l.includes('|')).map(line => { const p = line.split('|').map(x => x.trim()); return { q: p[0], a: p[1], w: p[2] }; });
+    game.active = true; game.camY = 0; game.won = false; game.particles = []; winUI.style.display = 'none';
+    rabbitImg.style.transform = 'rotate(0deg) scale(1)';
+    if(cfg.audios.start) cfg.audios.start.play().catch(()=>{});
+    let wl = [...cfg.lv]; if (document.getElementById('shuffle-check').checked) { for (let i = wl.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [wl[i],wl[j]]=[wl[j],wl[i]]; } }
+    game.currentQ = wl[0]?.q || "";
+    game.platforms = [{ x: 400, y: 400, w: cfg.st.pW * 1.4, h: cfg.st.pH, isOk: true, txt: document.getElementById('lbl-start').value, q: wl[0]?.q || "" }];
+    setTimeout(() => {
+        const hReal = rabbitImg.offsetHeight || cfg.st.hSize;
+        game.player = { x: 400, y: 400 - (cfg.st.pH/2) - (hReal/2) - game.feetOffset, vy: 0, targetX: 400, lastPlatY: 400 };
+    }, 50);
+    let cy = 400; wl.forEach((level, i) => { cy -= 220; let isL = Math.random() > 0.5;
+        game.platforms.push({ x: 230, y: cy, w: cfg.st.pW, h: cfg.st.pH, isOk: isL, txt: isL ? level.a : level.w, q: wl[i+1]?.q || FINISH_MARKER });
+        game.platforms.push({ x: 570, y: cy, w: cfg.st.pW, h: cfg.st.pH, isOk: !isL, txt: !isL ? level.a : level.w, q: wl[i+1]?.q || FINISH_MARKER });
+    }); 
+    game.totalClimb = 400 - cy;
+    render();
+}
+
+function render() {
+    if(!game.active) return;
+    if(!game.won) {
+        const p = game.player; 
+        const hReal = rabbitImg.offsetHeight || cfg.st.hSize;
+        const hHalf = hReal/2; const pHalf = cfg.st.pH/2;
+        if (p.vy !== 0 || p.y < (p.lastPlatY - 100)) { p.vy += 0.8; p.y += p.vy; p.x += (p.targetX - p.x) * 0.12; }
+        game.platforms.forEach(plat => { 
+            const b = p.y + hHalf + game.feetOffset; 
+            if(p.vy > 0 && Math.abs(p.x - plat.x) < (plat.w/2 + 20) && b > plat.y - pHalf && b < plat.y + pHalf + p.vy) {
+                if(plat.isOk){
+                    p.lastPlatY=plat.y; p.y=plat.y-pHalf-hHalf-game.feetOffset;
+                    if(p.vy>1&&plat.txt!==document.getElementById('lbl-start').value&&cfg.audios.ok){cfg.audios.ok.currentTime=0;cfg.audios.ok.play().catch(()=>{});} 
+                    p.vy=0; p.x=plat.x; p.targetX=plat.x; game.currentQ = (plat.q === FINISH_MARKER ? "" : plat.q); 
+                    if(plat.q===FINISH_MARKER)triggerWin();
+                } else{p.vy=-8;p.targetX=400;if(cfg.audios.err){cfg.audios.err.currentTime=0;cfg.audios.err.play().catch(()=>{});}}
+            }
+        });
+        game.camY += ((300 - p.y) - game.camY) * 0.1; if(p.y > 650 - game.camY) initGame();
+    } else { game.particles.forEach(pt => { pt.x += pt.vx; pt.y += pt.vy; pt.vy+=0.2; pt.life-=0.01; }); }
+    draw(); game.loopId = requestAnimationFrame(render);
+}
+
+function draw() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 800, 450);
+    if(cfg.bImg) { 
+        let s = 800 / cfg.bImg.width, sH = cfg.bImg.height * s;
+        let progress = Math.max(0, Math.min(1, game.camY / game.totalClimb));
+        let bgOffset = (sH - 450) - (progress * (sH - 450) * game.parallaxSpeed);
+        ctx.drawImage(cfg.bImg, 0, -bgOffset, 800, sH);
+    } else if(!cfg.st.isTrans) { 
+        ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,800,450); 
+    }
+    ctx.save(); ctx.translate(0, game.camY);
+    game.platforms.forEach(pl => { if(cfg.pImg) ctx.drawImage(cfg.pImg, pl.x-pl.w/2, pl.y-pl.h/2, pl.w, pl.h); else { ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(pl.x-pl.w/2, pl.y-pl.h/2, pl.w, pl.h); }
+        ctx.fillStyle = cfg.st.ansTxt; ctx.font = `bold 20px "${cfg.st.font}"`; ctx.textAlign = 'center'; ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.strokeText(pl.txt, pl.x, pl.y + 7); ctx.fillText(pl.txt, pl.x, pl.y + 7); });
+    game.particles.forEach(pt => { ctx.save(); if(cfg.st.useGlow){ctx.shadowBlur=10;ctx.shadowColor=pt.c;} ctx.fillStyle=pt.c; ctx.globalAlpha=pt.life; if(cfg.st.fx === 'hearts') { ctx.font = '18px serif'; ctx.fillText('❤️', pt.x, pt.y); } else if(cfg.st.fx === 'stars') { ctx.font = '18px serif'; ctx.fillText('⭐', pt.x, pt.y); } else { ctx.fillRect(pt.x, pt.y, pt.s, pt.s); } ctx.restore(); });
+    rabbitImg.style.left = (game.player.x - cfg.st.hSize/2)+'px'; rabbitImg.style.top = (game.player.y - (rabbitImg.offsetHeight/2 || cfg.st.hSize/2) + game.camY)+'px'; ctx.restore();
+    if(game.currentQ && !game.won) { if(cfg.st.useGlow){ctx.shadowBlur=20;ctx.shadowColor=cfg.st.glow;} ctx.fillStyle=cfg.st.qBg; ctx.fillRect(150, 20, 500, 60); ctx.strokeStyle=cfg.st.qBd; ctx.lineWidth=3; ctx.strokeRect(150, 20, 500, 60); ctx.shadowBlur=0; ctx.fillStyle=cfg.st.qTxt; ctx.font=`bold 24px "${cfg.st.font}"`; ctx.textAlign='center'; ctx.fillText(game.currentQ, 400, 58); }
+}
+
+function triggerWin() { game.won = true; if(cfg.audios.win) { cfg.audios.win.currentTime=0; cfg.audios.win.play().catch(()=>{}); } const fx = cfg.st.fx; for(let i=0; i<80; i++) game.particles.push({ x: game.player.x, y: game.player.y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, c: fx==='fireworks'||fx==='confetti' ? `hsl(${Math.random()*360},70%,60%)` : cfg.st.glow, s: Math.random()*6+2, life: 1 }); winUI.style.display = 'flex'; }
+
+stage.addEventListener('pointerdown', (e) => { if(!game.active || game.player.vy !== 0 || game.won) return; const r = stage.getBoundingClientRect(), s = r.width/800; const mx = (e.clientX-r.left)/s, my = (e.clientY-r.top)/s - game.camY; game.platforms.forEach(pl => { if (mx > pl.x-pl.w/2 && mx < pl.x+pl.w/2 && my > pl.y-pl.h/2 && my < pl.y+pl.h/2 && pl.y < game.player.y) { game.player.targetX = pl.x; game.player.vy = -20; } }); });
+
+let finalExport = "";
+function generateGeniallyCode() {
+    liveStyle();
+    const d = { h: document.getElementById('inp-h').value, hw: document.getElementById('inp-h-win').value, b: document.getElementById('inp-b').value, p: document.getElementById('inp-p').value, s_s: document.getElementById('s-start').value, s_o: document.getElementById('s-ok').value, s_e: document.getElementById('s-err').value, s_w: document.getElementById('s-win').value, l: { s: document.getElementById('lbl-start').value, f_q: FINISH_MARKER, w_t: document.getElementById('lbl-win').value, r: document.getElementById('lbl-retry').value }, lv: cfg.lv, st: cfg.st, para: game.parallaxSpeed, off: game.feetOffset, shuf: document.getElementById('shuffle-check').checked };
+    finalExport = `
+<link href="https://fonts.googleapis.com/css2?family=${d.st.font.replace(/ /g, '+')}:wght@700;800&display=swap" rel="stylesheet">
+<div id="p-box" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:${d.st.isTrans?'transparent':'#000'};position:absolute;inset:0;margin:0;padding:0;overflow:hidden;">
+    <div id="g-cont" style="width:800px;height:450px;position:relative;background:${d.st.isTrans?'transparent':'#020617'};border-radius:20px;overflow:hidden;transform-origin:center;flex-shrink:0;">
+        <div id="v-u" style="position:absolute;top:15px;right:15px;z-index:110;background:rgba(15, 23, 42, 0.6);padding:8px 12px;border-radius:20px;backdrop-filter:blur(5px);display:none;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.1);color:#fff;"><span>🔊</span><input type="range" style="width:60px;cursor:pointer;" min="0" max="1" step="0.1" value="0.5" oninput="setV(this.value)"></div>
+        <canvas id="cv" width="800" height="450" style="position:absolute;top:0;left:0;z-index:1;background:transparent;touch-action:none;cursor:pointer;"></canvas>
+        <img id="rb" src="${d.h}" style="position:absolute;width:${d.st.hSize}px;height:auto;z-index:10;pointer-events:none;transform-origin:center bottom;">
+        <div id="w" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:85%;max-height:90%;padding:30px;background:${d.st.winBg}b3;backdrop-filter:blur(12px);border:2px solid ${d.st.winBd};border-radius:30px;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);box-sizing:border-box;overflow:hidden;">
+            <img src="${d.hw}" style="max-height:180px;width:auto;margin-bottom:15px;display:${d.hw?'block':'none'};object-fit:contain;">
+            <h2 style="font-size:clamp(1.5rem, 6vw, 2.5rem);color:${d.st.winTxt};margin:10px 0;width:100%;word-wrap:break-word;font-family:'${d.st.font}',sans-serif;${d.st.useGlow?'text-shadow:0 0 20px '+d.st.glow:''}">${d.l.w_t}</h2>
+            <button onclick="initGame()" style="width:200px;padding:12px 0;border:none;border-radius:8px;background:${d.st.btnBg};color:${d.st.btnTxt};font-weight:bold;cursor:pointer;text-transform:uppercase;font-family:sans-serif;">${d.l.r}</button>
+        </div>
+    </div>
+</div>
+<script>
+(function(){
+    const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),rb=document.getElementById('rb'),w=document.getElementById('w'),p=document.getElementById('p-box'),c=document.getElementById('g-cont'),vu=document.getElementById('v-u');
+    let cfg={lv:${JSON.stringify(d.lv)}, pI:null, bI:null, l:${JSON.stringify(d.l)}, st:${JSON.stringify(d.st)}, audios:{}, vol:0.5};
+    let game={active:false,loop:null,camY:0,hero:{x:400,y:300,vy:0,targetX:400,lastPlatY:400},platforms:[],particles:[],off:Number("${d.off}"),won:false,para:Number("${d.para}"),currentQ:"",totalC:0};
+    function ldI(k,u){if(!u)return;const i=new Image();i.crossOrigin="anonymous";i.onload=()=>cfg[k+'I']=i;i.src=u;}
+    function ldA(k,u){if(!u)return;const a=new Audio(u);a.volume=cfg.vol;cfg.audios[k]=a;}
+    window.setV=function(v){cfg.vol=v;Object.values(cfg.audios).forEach(a=>a.volume=v);};
+    function onR(){ if(!p.clientWidth) return; const s=Math.min(p.clientWidth/800,p.clientHeight/450); c.style.transform='scale('+s+')'; }
+    window.initGame=function(){ if(game.loop)cancelAnimationFrame(game.loop); game.active=true;game.camY=0;game.won=false;game.particles=[];w.style.display='none';rb.style.display='block'; let wl=[...cfg.lv]; if(${d.shuf}){for(let i=wl.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[wl[i],wl[j]]=[wl[j],wl[i]];}}
+        game.currentQ=wl[0]?.q||""; 
+        game.platforms=[{x:400,y:400,w:cfg.st.pW*1.4,h:cfg.st.pH,isOk:true,txt:cfg.l.s,q:wl[0]?.q||""}]; 
+        setTimeout(()=>{
+            const hR = rb.offsetHeight || cfg.st.hSize;
+            game.hero={x:400,y:400-(cfg.st.pH/2)-(hR/2)-game.off,vy:0,targetX:400,lastPlatY:400};
+        },50);
+        let cy=400;wl.forEach((l,i)=>{cy-=220;let isL=Math.random()>0.5;game.platforms.push({x:230,y:cy,w:cfg.st.pW,h:cfg.st.pH,isOk:isL,txt:isL?l.a:l.w,q:wl[i+1]?.q||cfg.l.f_q});game.platforms.push({x:570,y:cy,w:cfg.st.pW,h:cfg.st.pH,isOk:!isL,txt:!isL?l.a:l.w,q:wl[i+1]?.q||cfg.l.f_q});}); 
+        game.totalC = 400 - cy; if(cfg.audios.start)cfg.audios.start.play().catch(()=>{}); vu.style.display='flex'; render(); };
+    function render(){ if(!game.active)return; if(!game.won){ const h=game.hero; const hR = rb.offsetHeight || cfg.st.hSize; const hH=hR/2, pH=cfg.st.pH/2; if(h.vy!==0||h.y<(h.lastPlatY-5)){h.vy+=0.8;h.y+=h.vy;h.x+=(h.targetX-h.x)*0.12;} game.platforms.forEach(plat=>{ const b=h.y+hH+game.off; if(h.vy>0&&Math.abs(h.x-plat.x)<(plat.w/2+20)&&b>plat.y-pH&&b<plat.y+pH+h.vy){ if(plat.isOk){h.lastPlatY=plat.y;h.y=plat.y-pH-hH-game.off;if(h.vy>1&&plat.txt!==cfg.l.s&&cfg.audios.ok){cfg.audios.ok.currentTime=0;cfg.audios.ok.play().catch(()=>{});} h.vy=0;h.x=plat.x;h.targetX=plat.x;game.currentQ=(plat.q===cfg.l.f_q?"":plat.q);if(plat.q===cfg.l.f_q)triggerWin();}else{h.vy=-8;h.targetX=400;if(cfg.audios.err){cfg.audios.err.currentTime=0;cfg.audios.err.play().catch(()=>{});}}}}); game.camY+=((300-h.y)-game.camY)*0.1;if(h.y>650-game.camY)initGame(); }else{game.particles.forEach(pt=>{pt.x+=pt.vx;pt.y+=pt.vy;pt.vy+=0.2;pt.life-=0.01;});} draw(); game.loop=requestAnimationFrame(render); }
+    function draw(){ ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,800,450); if(cfg.bI){ let s=800/cfg.bI.width,sH=cfg.bI.height*s,prog=Math.max(0,Math.min(1,game.camY/game.totalC)),bgO=(sH-450)-(prog*(sH-450)*game.para);ctx.drawImage(cfg.bI,0,-bgO,800,sH); }
+        ctx.save();ctx.translate(0,game.camY); game.platforms.forEach(plat=>{ if(cfg.pI)ctx.drawImage(cfg.pI,plat.x-plat.w/2,plat.y-plat.h/2,plat.w,plat.h);else{ctx.fillStyle='rgba(255,255,255,0.1)';ctx.fillRect(plat.x-plat.w/2,plat.y-plat.h/2,plat.w,plat.h);} ctx.fillStyle=cfg.st.ansTxt;ctx.font='bold 20px "'+cfg.st.font+'", sans-serif';ctx.textAlign='center';ctx.strokeStyle='#000';ctx.lineWidth=4;ctx.strokeText(plat.txt,plat.x,plat.y+7);ctx.fillText(plat.txt,plat.x,plat.y+7);});
+        game.particles.forEach(pt=>{ctx.save();if(cfg.st.useGlow){ctx.shadowBlur=10;ctx.shadowColor=pt.c;}ctx.fillStyle=pt.c;ctx.globalAlpha=pt.life;if(cfg.st.fx==='hearts'){ctx.font='18px serif';ctx.fillText('❤️',pt.x,pt.y);}else if(cfg.st.fx==='stars'){ctx.font='18px serif';ctx.fillText('⭐',pt.x,pt.y);}else{ctx.fillRect(pt.x,pt.y,pt.s,pt.s);}ctx.restore();}); rb.style.left=(game.hero.x-cfg.st.hSize/2)+'px';rb.style.top=(game.hero.y-(rb.offsetHeight/2||cfg.st.hSize/2)+game.camY)+'px';ctx.restore();
+        if(game.currentQ&&!game.won){if(cfg.st.useGlow){ctx.shadowBlur=20;ctx.shadowColor=cfg.st.glow;}ctx.fillStyle=cfg.st.qBg;ctx.fillRect(150,20,500,60);ctx.strokeStyle=cfg.st.qBd;ctx.lineWidth=3;ctx.strokeRect(150,20,500,60);ctx.shadowBlur=0;ctx.fillStyle=cfg.st.qTxt;ctx.font='bold 24px "'+cfg.st.font+'", sans-serif';ctx.textAlign='center';ctx.fillText(game.currentQ,400,58);} }
+    function triggerWin(){ game.won=true; if(cfg.audios.win){cfg.audios.win.currentTime=0;cfg.audios.win.play().catch(()=>{});} const f=cfg.st.fx; for(let i=0; i<80; i++)game.particles.push({x:game.hero.x,y:game.hero.y,vx:(Math.random()-0.5)*15,vy:(Math.random()-0.5)*15,c:f==='fireworks'||f==='confetti'?'hsl('+(Math.random()*360)+',70%,60%)':cfg.st.glow,s:Math.random()*6+2,life:1}); let t=0;let d=setInterval(()=>{t+=0.2;rb.style.transform='rotate('+(Math.sin(t)*25)+'deg) scale('+(1+Math.abs(Math.sin(t)*0.3))+')';if(t>8){clearInterval(d);w.style.display='flex';}},30);}
+    c.addEventListener('pointerdown',(e)=>{if(!game.active||game.hero.vy!==0||game.won)return;const r=c.getBoundingClientRect(),s=r.width/800,mx=(e.clientX-r.left)/s,my=(e.clientY-r.top)/s-game.camY;game.platforms.forEach(plat=>{if(mx>plat.x-plat.w/2&&mx<plat.x+plat.w/2&&my>plat.y-plat.h/2&&my<plat.y+plat.h/2&&plat.y<game.hero.y){game.hero.targetX=plat.x;game.hero.vy=-20;}});});
+    ldI('b',"${d.b}");ldI('p',"${d.p}");ldA('start',"${d.s_s}");ldA('ok',"${d.s_o}");ldA('err',"${d.s_e}");ldA('win',"${d.s_w}");
+    new ResizeObserver(onR).observe(p); setTimeout(()=>{onR();initGame();},1200);
+})();
+<\/script>`;
+    document.getElementById('copy-btn').style.display = 'block';
+    showTemporaryMessage('gen-msg');
+}
+function copyToClipboard() { navigator.clipboard.writeText(finalExport).then(() => { showTemporaryMessage('copy-msg'); }); }
+liveStyle();
+</script>
+</body>
+</html>
