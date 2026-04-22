@@ -126,10 +126,11 @@
     </div>
     
     <button class="btn btn-play" onclick="initGame()">ЗАПУСТИТЬ ПРЕДПРОСМОТР 🚀</button>
-    <div style="margin-top:5px; border-top:1px solid var(--bd); padding-top:5px">
-        <button class="btn btn-gen" onclick="generateGeniallyCode()">ГЕНЕРИРОВАТЬ КОД ДЛЯ GENIALLY</button>
-        <div id="gen-msg" style="color:var(--ok); font-size:10px; text-align:center; margin-top:5px; display:none">КОД СГЕНЕРИРОВАН! ✨</div>
+    <div style="margin-top:5px; border-top:1px solid var(--bd); padding-top:5px; position: relative;">
+        <button id="gen-btn" class="btn btn-gen" onclick="generateGeniallyCode()">ГЕНЕРИРОВАТЬ КОД ДЛЯ GENIALLY</button>
         <button id="copy-btn" class="btn btn-copy" onclick="copyToClipboard()">СКОПИРОВАТЬ 📋</button>
+        
+        <div id="gen-msg" style="color:var(--ok); font-size:10px; text-align:center; margin-top:5px; display:none">КОД СГЕНЕРИРОВАН! ✨</div>
         <div id="copy-msg" style="color:var(--ok); font-size:10px; text-align:center; margin-top:5px; display:none">СКОПИРОВАНО!</div>
     </div>
 </div>
@@ -328,10 +329,19 @@ function generateGeniallyCode() {
     new ResizeObserver(onR).observe(p); setTimeout(()=>{onR();initGame();},1200);
 })();
 <\/script>`;
+    document.getElementById('gen-btn').style.display = 'none';
     document.getElementById('copy-btn').style.display = 'block';
     showTemporaryMessage('gen-msg');
 }
-function copyToClipboard() { navigator.clipboard.writeText(finalExport).then(() => { showTemporaryMessage('copy-msg'); }); }
+
+function copyToClipboard() { 
+    navigator.clipboard.writeText(finalExport).then(() => { 
+        showTemporaryMessage('copy-msg');
+        document.getElementById('copy-btn').style.display = 'none';
+        document.getElementById('gen-btn').style.display = 'block';
+    }); 
+}
+
 liveStyle();
 </script>
 </body>
