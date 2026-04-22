@@ -65,7 +65,7 @@
                 <div class="ui-item" style="flex-direction:row"><label>Фон вопроса</label><input type="color" id="clr-q-bg" value="#0f172a" oninput="liveStyle()"></div>
                 <div class="ui-item" style="flex-direction:row"><label>Рамка вопроса</label><input type="color" id="clr-q-bd" value="#ffffff" oninput="liveStyle()"></div>
                 <div class="ui-item" style="flex-direction:row"><label>Текст вопроса</label><input type="color" id="clr-q-txt" value="#f59e0b" oninput="liveStyle()"></div>
-                <div class="ui-item" style="flex-direction:row"><label>Цвет Glow</label><input type="color" id="clr-glow" value="#f59e0b" oninput="liveStyle()"></div>
+                <div class="ui-item" style="flex-direction:row"><label>Цвет Подсветки</label><input type="color" id="clr-glow" value="#f59e0b" oninput="liveStyle()"></div>
                 <div class="ui-item" style="flex-direction:row"><label>Окно победы</label><input type="color" id="clr-win-bg" value="#0f172a" oninput="liveStyle()"></div>
                 <div class="ui-item" style="flex-direction:row"><label>Текст победы</label><input type="color" id="clr-win-txt" value="#f59e0b" oninput="liveStyle()"></div>
                 <div class="ui-item" style="flex-direction:row"><label>Фон Retry</label><input type="color" id="clr-btn-bg" value="#f59e0b" oninput="liveStyle()"></div>
@@ -114,9 +114,9 @@
 
         <h2>🔤 ТЕКСТЫ</h2>
         <div class="box"><div class="ui-grid">
-            <div class="ui-item"><label>Старт</label><input type="text" id="lbl-start" value="START"></div>
-            <div class="ui-item"><label>Победа</label><input type="text" id="lbl-win" value="VICTORY!"></div>
-            <div class="ui-item"><label>Повторить</label><input type="text" id="lbl-retry" value="RETRY"></div>
+            <div class="ui-item"><label>Старт</label><input type="text" id="lbl-start" value="НАЧАТЬ"></div>
+            <div class="ui-item"><label>Победа</label><input type="text" id="lbl-win" value="ПОБЕДА!"></div>
+            <div class="ui-item"><label>Повторить</label><input type="text" id="lbl-retry" value="СЫГРАТЬ ЕЩЁ РАЗ"></div>
         </div></div>
 
         <div id="creator-credit">
@@ -335,11 +335,35 @@ function generateGeniallyCode() {
 }
 
 function copyToClipboard() { 
-    navigator.clipboard.writeText(finalExport).then(() => { 
-        showTemporaryMessage('copy-msg');
-        document.getElementById('copy-btn').style.display = 'none';
-        document.getElementById('gen-btn').style.display = 'block';
+    const text = finalExport;
+    
+    // Пытаемся использовать стандартный метод
+    navigator.clipboard.writeText(text).then(() => { 
+        handleCopySuccess();
+    }).catch(() => {
+        // Fallback: если navigator.clipboard заблокирован в iFrame (для Genially)
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            const successful = document.execCommand('copy');
+            if(successful) handleCopySuccess();
+        } catch (err) {
+            console.error('Ошибка копирования:', err);
+        }
+        document.body.removeChild(textArea);
     }); 
+}
+
+function handleCopySuccess() {
+    showTemporaryMessage('copy-msg');
+    document.getElementById('copy-btn').style.display = 'none';
+    document.getElementById('gen-btn').style.display = 'block';
 }
 
 liveStyle();
